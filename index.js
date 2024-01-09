@@ -1,48 +1,29 @@
-const http = require('node:http');
-const fs = require('node:fs');
-const path = require('node:path');
+const express = require('express');
+const path = require('path');
 
-const PORT = process.env.PORT || 8080;
+const app = express();
+const port = 3000;
 
-const server = http.createServer((req, res) => {
 
-  const filepath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
-
-  const extname = path.extname(filepath);
-
-  let contentType = 'text/html';
-
-  switch(extname) {
-    case '.js':
-      contentType = 'text/javascript';
-      break;
-    case '.css':
-      contentType = 'text/css';
-      break;
-    case '.json':
-      contentType = 'application/json';
-      break;
-    case '.png':
-      contentType = 'image/png';
-      break;
-    case '.jpg':
-      contentType = 'image/jpg';
-      break;  
-    default :  
-      break;
-  }
-
-  fs.readFile(filepath, (err, content) => {
-    if(err) {
-      fs.readFile(path.join(__dirname, '404.html'), () => {
-        res.writeHead(200, { 'Content-Type': 'text/html'});
-        res.end(content, 'utf8');
-      });
-    } else {
-      res.writeHead(200, { 'Content-Type': contentType });
-      res.end(content, 'utf8');
-    }
-  });
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.get('/about.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'about.html'));
+});
+
+app.get('/contact-me.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'contact-me.html'));
+});
+
+
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, '404.html'));
+});
+
+
+
+app.listen(port, () => {
+  console.log(`App listening on port ${port}`);
+});
